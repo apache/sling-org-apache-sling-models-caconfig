@@ -16,8 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.sling.models.caconfig.example.caconfig;
 
-@Version("1.0.0")
-package org.apache.sling.models.caconfig;
+import org.apache.sling.caconfig.annotation.Configuration;
 
-import org.osgi.annotation.versioning.Version;
+@Configuration(collection = true)
+public @interface ListConfig {
+
+    String stringParam();
+
+    int intParam() default 5;
+
+    boolean boolParam();
+
+}
