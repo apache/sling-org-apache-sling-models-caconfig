@@ -30,12 +30,21 @@ import org.apache.sling.models.spi.injectorspecific.InjectAnnotation;
 
 /**
  * Annotation to be used on either methods, fields or constructor parameters to let Sling Models inject a context-aware configuration.
+ * The annotation supports the same features and semantics as {@link org.apache.sling.caconfig.ConfigurationBuilder}.
+ * For configuration collections, you can use arrays, {@link java.util.List} or {@link java.util.Collection} variables.
  */
 @Target({ METHOD, FIELD, PARAMETER })
 @Retention(RUNTIME)
 @InjectAnnotation
 @Source("caconfig")
 public @interface ContextAwareConfiguration {
+
+    /**
+     * Define configuration name.
+     * Optional if used together with a context-aware configuration annotation class, which implictely defines a configuration name.
+     * @return Configuration name
+     */
+    public String name() default "";
 
     /**
      * if set to REQUIRED injection is mandatory, if set to OPTIONAL injection is optional, in case of DEFAULT
