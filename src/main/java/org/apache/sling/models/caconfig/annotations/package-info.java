@@ -18,6 +18,6 @@
  */
 
 @Version("1.0.0")
-package org.apache.sling.models.caconfig;
+package org.apache.sling.models.caconfig.annotations;
 
 import org.osgi.annotation.versioning.Version;
