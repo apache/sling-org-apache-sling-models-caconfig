@@ -26,7 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.adapter.Adaptable;
+import org.apache.sling.api.resource.Resource;
+import org.apache.sling.caconfig.management.multiplexer.ConfigurationInjectResourceDetectionStrategyMultiplexer;
+import org.apache.sling.caconfig.spi.ConfigurationInjectResourceDetectionStrategy;
 import org.apache.sling.models.caconfig.example.caconfig.ListConfig;
 import org.apache.sling.models.caconfig.example.caconfig.SingleConfig;
 import org.apache.sling.models.caconfig.example.caconfig.model.ConfigurationValuesModel;
@@ -46,9 +51,12 @@ import org.apache.sling.testing.mock.caconfig.MockContextAwareConfig;
 import org.apache.sling.testing.mock.sling.junit5.SlingContext;
 import org.apache.sling.testing.mock.sling.junit5.SlingContextBuilder;
 import org.apache.sling.testing.mock.sling.junit5.SlingContextExtension;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.osgi.framework.Constants;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -76,12 +84,41 @@ class ContextAwareConfigurationInjectorTest {
         MockContextAwareConfig.writeConfigurationCollection(context, "/content/region/site", ListConfig.class, ImmutableList.of(
                 ImmutableMap.<String,Object>of("stringParam", "item1"),
                 ImmutableMap.<String,Object>of("stringParam", "item2")));
-
-        context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
     }
 
     @Test
     void testSingleConfigModel_Request() {
+        assertSingleConfig(SingleConfigModel.class, context.request(), SingleConfig::stringParam);
+    }
+
+    @Test
+    void testSingleConfigModel_Request_WithConfigurationInjectResourceDetectionStrategy() {
+        // set another resource as current resource which has not caconfig applied
+        Resource otherCurrentResource = context.currentResource(context.create().resource("/content/region2/site2/en2"));
+        // register a custom ConfigurationInjectResourceDetectionStrategy which redirects to a resource with caconfig available
+        context.registerService(ConfigurationInjectResourceDetectionStrategy.class, new ConfigurationInjectResourceDetectionStrategy() {
+            @Override
+            @SuppressWarnings("null")
+            public @Nullable Resource detectResource(@NotNull SlingHttpServletRequest request) {
+                if (StringUtils.equals(request.getResource().getPath(), otherCurrentResource.getPath())) {
+                    return context.resourceResolver().getResource("/content/region/site/en");
+                }
+                return null;
+            }
+        }, Constants.SERVICE_RANKING, 100);
+        assertSingleConfig(SingleConfigModel.class, context.request(), SingleConfig::stringParam);
+    }
+
+    @Test
+    void testSingleConfigModel_Request_WithConfigurationInjectResourceDetectionStrategy_NoStrategies() {
+        // simulate no registered strategies
+        context.registerService(ConfigurationInjectResourceDetectionStrategyMultiplexer.class, new ConfigurationInjectResourceDetectionStrategyMultiplexer() {
+            @Override
+            public @Nullable Resource detectResource(@NotNull SlingHttpServletRequest request) {
+                return null;
+            }
+
+        }, Constants.SERVICE_RANKING, 100);
         assertSingleConfig(SingleConfigModel.class, context.request(), SingleConfig::stringParam);
     }
 
@@ -141,6 +178,7 @@ class ContextAwareConfigurationInjectorTest {
     }
 
     private <T> void assertSingleConfig(Class<? extends SingleConfigGetter<T>> modelClass, Adaptable adaptable, Function<T,String> extractor) {
+        context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         SingleConfigGetter<T> model = adaptable.adaptTo(modelClass);
         assertNotNull(model);
         T config = model.getConfig();
@@ -148,6 +186,7 @@ class ContextAwareConfigurationInjectorTest {
     }
 
     private <T> void assertListConfig(Class<? extends ListConfigGetter<T>> modelClass, Adaptable adaptable, Function<T,String> extractor) {
+        context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         ListConfigGetter<T> model = adaptable.adaptTo(modelClass);
         assertNotNull(model);
         assertListValues(model.getConfigList(), extractor);
@@ -164,6 +203,7 @@ class ContextAwareConfigurationInjectorTest {
 
     @Test
     void testInvalid_SingleConfigModel_ResourceResolver() {
+        context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         SingleConfigModel model = context.resourceResolver().adaptTo(SingleConfigModel.class);
         assertNull(model);
     }
@@ -171,6 +211,7 @@ class ContextAwareConfigurationInjectorTest {
     @Test
     @SuppressWarnings("null")
     void testInvalidInjectModel() {
+        context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         InvalidInjectModel model = context.request().adaptTo(InvalidInjectModel.class);
         assertNull(model);
     }
@@ -178,6 +219,7 @@ class ContextAwareConfigurationInjectorTest {
     @Test
     @SuppressWarnings("null")
     void testInvalidAnnotationModel() {
+        context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         InvalidAnnotationModel model = context.request().adaptTo(InvalidAnnotationModel.class);
         assertNull(model);
     }
@@ -185,6 +227,7 @@ class ContextAwareConfigurationInjectorTest {
     @Test
     @SuppressWarnings("null")
     void testInvalidAnnotationListModel() {
+        context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         InvalidAnnotationListModel model = context.request().adaptTo(InvalidAnnotationListModel.class);
         assertNull(model);
     }
@@ -192,6 +235,7 @@ class ContextAwareConfigurationInjectorTest {
     @Test
     @SuppressWarnings("null")
     void testInvalidSetModel() {
+        context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         InvalidSetModel model = context.request().adaptTo(InvalidSetModel.class);
         assertNull(model);
     }

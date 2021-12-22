@@ -33,6 +33,7 @@ import org.apache.sling.caconfig.ConfigurationBuilder;
 import org.apache.sling.caconfig.ConfigurationResolveException;
 import org.apache.sling.caconfig.ConfigurationResolver;
 import org.apache.sling.caconfig.annotation.Configuration;
+import org.apache.sling.caconfig.management.multiplexer.ConfigurationInjectResourceDetectionStrategyMultiplexer;
 import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
 import org.apache.sling.models.spi.AcceptsNullName;
 import org.apache.sling.models.spi.DisposalCallbackRegistry;
@@ -55,6 +56,8 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
 
     @Reference
     private ConfigurationResolver configurationResolver;
+    @Reference
+    private ConfigurationInjectResourceDetectionStrategyMultiplexer configurationInjectResourceDetectionStrategyMultiplexer;
 
     @Override
     public @NotNull String getName() {
@@ -147,7 +150,11 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
         }
         if (adaptable instanceof SlingHttpServletRequest) {
             SlingHttpServletRequest request = (SlingHttpServletRequest)adaptable;
-            return request.getResource();
+            Resource resource = configurationInjectResourceDetectionStrategyMultiplexer.detectResource(request);
+            if (resource == null) {
+                resource = request.getResource();
+            }
+            return resource;
         }
         return null;
     }
