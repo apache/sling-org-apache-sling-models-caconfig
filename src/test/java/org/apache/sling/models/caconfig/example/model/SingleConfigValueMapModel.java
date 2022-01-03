@@ -23,6 +23,7 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
+import org.apache.sling.models.caconfig.example.testhelper.SingleConfigGetter;
 
 @Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
 public class SingleConfigValueMapModel implements SingleConfigGetter<ValueMap> {

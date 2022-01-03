@@ -24,6 +24,7 @@ import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
 import org.apache.sling.models.caconfig.example.caconfig.SingleConfig;
+import org.apache.sling.models.caconfig.example.testhelper.SingleConfigGetter;
 
 @Model(adaptables = { SlingHttpServletRequest.class, Resource.class, ResourceResolver.class })
 public class SingleConfigModel implements SingleConfigGetter<SingleConfig> {

@@ -23,6 +23,7 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
 import org.apache.sling.models.caconfig.example.caconfig.model.ConfigurationValuesModel;
+import org.apache.sling.models.caconfig.example.testhelper.SingleConfigGetter;
 
 @Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
 public class SingleConfigAdaptModel implements SingleConfigGetter<ConfigurationValuesModel> {

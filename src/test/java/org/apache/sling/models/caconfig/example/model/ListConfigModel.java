@@ -26,6 +26,7 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
 import org.apache.sling.models.caconfig.example.caconfig.ListConfig;
+import org.apache.sling.models.caconfig.example.testhelper.ListConfigGetter;
 
 @Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
 public class ListConfigModel implements ListConfigGetter<ListConfig> {

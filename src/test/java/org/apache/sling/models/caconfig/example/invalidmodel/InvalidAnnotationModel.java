@@ -16,25 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.sling.models.caconfig.example.model;
-
-import javax.inject.Inject;
+package org.apache.sling.models.caconfig.example.invalidmodel;
 
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.models.annotations.Model;
-import org.apache.sling.models.annotations.Source;
-import org.apache.sling.models.caconfig.example.caconfig.SingleConfig;
+import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
 
 @Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
-public class InvalidInjectModel {
+public class InvalidAnnotationModel {
 
-    // only injection with explicit annotation @ContextAwareConfiguration is supported
-    @Inject
-    @Source("caconfig")
-    private SingleConfig config;
+    // "Model" is not a valid caconfig annotation
+    @ContextAwareConfiguration
+    private Model config;
 
-    public SingleConfig getConfig() {
+    public Model getConfig() {
         return config;
     }
 

@@ -16,22 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.sling.models.caconfig.example.model;
+package org.apache.sling.models.caconfig.example.testhelper;
 
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.resource.Resource;
-import org.apache.sling.models.annotations.Model;
-import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
+public interface SingleConfigGetter<T> {
 
-@Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
-public class InvalidAnnotationModel {
-
-    // "Model" is not a valid caconfig annotation
-    @ContextAwareConfiguration
-    private Model config;
-
-    public Model getConfig() {
-        return config;
-    }
+    T getConfig();
 
 }

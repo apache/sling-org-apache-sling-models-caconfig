@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.sling.models.caconfig.example.model;
+package org.apache.sling.models.caconfig.example.testhelper;
 
 import java.util.Collection;
 import java.util.List;
