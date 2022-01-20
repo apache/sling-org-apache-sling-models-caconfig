@@ -82,7 +82,7 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
         ContextAwareConfiguration annotation = getAnnotation(element);
         if (annotation == null) {
             // support injections only with explicit @ContextAwareConfiguration annotation
-            log.warn("Injection only supported using @ContextAwareConfiguration annotation.");
+            log.debug("Injection only supported using @ContextAwareConfiguration annotation.");
             return null;
         }
 
