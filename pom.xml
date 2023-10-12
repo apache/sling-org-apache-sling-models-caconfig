@@ -36,7 +36,7 @@
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-models-caconfig.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-models-caconfig.git</developerConnection>
-        <url>https://gitbox.apache.org/repos/asf?p=sling-org-apache-sling-models-caconfig.git</url>
+        <url>https://github.com/apache/sling-org-apache-sling-models-caconfig.git</url>
       <tag>HEAD</tag>
   </scm>
 
