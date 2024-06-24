@@ -25,7 +25,7 @@ import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
 import org.apache.sling.models.caconfig.example.testhelper.SingleConfigGetter;
 
-@Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
+@Model(adaptables = {SlingHttpServletRequest.class, Resource.class})
 public class SingleConfigValueMapModel implements SingleConfigGetter<ValueMap> {
 
     @ContextAwareConfiguration(name = "testSingleConfig")
@@ -35,5 +35,4 @@ public class SingleConfigValueMapModel implements SingleConfigGetter<ValueMap> {
     public ValueMap getConfig() {
         return config;
     }
-
 }

@@ -21,5 +21,4 @@ package org.apache.sling.models.caconfig.example.testhelper;
 public interface SingleConfigGetter<T> {
 
     T getConfig();
-
 }

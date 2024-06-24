@@ -26,7 +26,7 @@ import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.Source;
 import org.apache.sling.models.caconfig.example.caconfig.SingleConfig;
 
-@Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
+@Model(adaptables = {SlingHttpServletRequest.class, Resource.class})
 public class InvalidInjectModel {
 
     // only injection with explicit annotation @ContextAwareConfiguration is supported
@@ -37,5 +37,4 @@ public class InvalidInjectModel {
     public SingleConfig getConfig() {
         return config;
     }
-
 }

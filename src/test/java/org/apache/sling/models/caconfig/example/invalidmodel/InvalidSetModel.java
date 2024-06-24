@@ -26,7 +26,7 @@ import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
 import org.apache.sling.models.caconfig.example.caconfig.ListConfig;
 
-@Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
+@Model(adaptables = {SlingHttpServletRequest.class, Resource.class})
 public class InvalidSetModel {
 
     // Set is not supported as collection type
@@ -36,5 +36,4 @@ public class InvalidSetModel {
     public Set<ListConfig> getConfigList() {
         return configList;
     }
-
 }
