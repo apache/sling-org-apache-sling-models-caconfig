@@ -31,28 +31,34 @@ public class ConfigurationValuesModel {
 
     @ValueMapValue
     private String stringParam;
+
     @ValueMapValue
     private int intParam;
+
     @ValueMapValue
     private boolean boolParam;
 
     public String getStringParam() {
         return stringParam;
     }
+
     public void setStringParam(String stringParam) {
         this.stringParam = stringParam;
     }
+
     public int getIntParam() {
         return intParam;
     }
+
     public void setIntParam(int intParam) {
         this.intParam = intParam;
     }
+
     public boolean isBoolParam() {
         return boolParam;
     }
+
     public void setBoolParam(boolean boolParam) {
         this.boolParam = boolParam;
     }
-
 }

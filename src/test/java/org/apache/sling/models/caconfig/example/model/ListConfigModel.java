@@ -28,7 +28,7 @@ import org.apache.sling.models.caconfig.annotations.ContextAwareConfiguration;
 import org.apache.sling.models.caconfig.example.caconfig.ListConfig;
 import org.apache.sling.models.caconfig.example.testhelper.ListConfigGetter;
 
-@Model(adaptables = { SlingHttpServletRequest.class, Resource.class })
+@Model(adaptables = {SlingHttpServletRequest.class, Resource.class})
 public class ListConfigModel implements ListConfigGetter<ListConfig> {
 
     @ContextAwareConfiguration
@@ -54,5 +54,4 @@ public class ListConfigModel implements ListConfigGetter<ListConfig> {
     public ListConfig[] getConfigArray() {
         return configArray;
     }
-
 }

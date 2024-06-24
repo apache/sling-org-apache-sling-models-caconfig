@@ -18,14 +18,11 @@
  */
 package org.apache.sling.models.caconfig.impl.injectors;
 
-import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import java.util.List;
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.adapter.Adaptable;
@@ -58,32 +55,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.Constants;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SlingContextExtension.class)
 class ContextAwareConfigurationInjectorTest {
 
-    private final SlingContext context = new SlingContextBuilder()
-            .plugin(CACONFIG)
-            .build();
+    private final SlingContext context =
+            new SlingContextBuilder().plugin(CACONFIG).build();
 
     @BeforeEach
     void setUp() {
         MockContextAwareConfig.registerAnnotationPackages(context, "org.apache.sling.models.caconfig.example.caconfig");
         context.addModelsForPackage("org.apache.sling.models.caconfig.example.model");
 
-        context.create().resource("/content/region/site",
-                "sling:configRef", "/conf/region/site");
+        context.create().resource("/content/region/site", "sling:configRef", "/conf/region/site");
 
         context.currentResource(context.create().resource("/content/region/site/en"));
 
-        MockContextAwareConfig.writeConfiguration(context, "/content/region/site", SingleConfig.class,
-                "stringParam", "value1");
+        MockContextAwareConfig.writeConfiguration(
+                context, "/content/region/site", SingleConfig.class, "stringParam", "value1");
 
-        MockContextAwareConfig.writeConfigurationCollection(context, "/content/region/site", ListConfig.class, ImmutableList.of(
-                ImmutableMap.<String,Object>of("stringParam", "item1"),
-                ImmutableMap.<String,Object>of("stringParam", "item2")));
+        MockContextAwareConfig.writeConfigurationCollection(
+                context,
+                "/content/region/site",
+                ListConfig.class,
+                ImmutableList.of(
+                        ImmutableMap.<String, Object>of("stringParam", "item1"),
+                        ImmutableMap.<String, Object>of("stringParam", "item2")));
     }
 
     @Test
@@ -94,31 +95,40 @@ class ContextAwareConfigurationInjectorTest {
     @Test
     void testSingleConfigModel_Request_WithConfigurationInjectResourceDetectionStrategy() {
         // set another resource as current resource which has not caconfig applied
-        Resource otherCurrentResource = context.currentResource(context.create().resource("/content/region2/site2/en2"));
-        // register a custom ConfigurationInjectResourceDetectionStrategy which redirects to a resource with caconfig available
-        context.registerService(ConfigurationInjectResourceDetectionStrategy.class, new ConfigurationInjectResourceDetectionStrategy() {
-            @Override
-            @SuppressWarnings("null")
-            public @Nullable Resource detectResource(@NotNull SlingHttpServletRequest request) {
-                if (StringUtils.equals(request.getResource().getPath(), otherCurrentResource.getPath())) {
-                    return context.resourceResolver().getResource("/content/region/site/en");
-                }
-                return null;
-            }
-        }, Constants.SERVICE_RANKING, 100);
+        Resource otherCurrentResource =
+                context.currentResource(context.create().resource("/content/region2/site2/en2"));
+        // register a custom ConfigurationInjectResourceDetectionStrategy which redirects to a resource with caconfig
+        // available
+        context.registerService(
+                ConfigurationInjectResourceDetectionStrategy.class,
+                new ConfigurationInjectResourceDetectionStrategy() {
+                    @Override
+                    @SuppressWarnings("null")
+                    public @Nullable Resource detectResource(@NotNull SlingHttpServletRequest request) {
+                        if (StringUtils.equals(request.getResource().getPath(), otherCurrentResource.getPath())) {
+                            return context.resourceResolver().getResource("/content/region/site/en");
+                        }
+                        return null;
+                    }
+                },
+                Constants.SERVICE_RANKING,
+                100);
         assertSingleConfig(SingleConfigModel.class, context.request(), SingleConfig::stringParam);
     }
 
     @Test
     void testSingleConfigModel_Request_WithConfigurationInjectResourceDetectionStrategy_NoStrategies() {
         // simulate no registered strategies
-        context.registerService(ConfigurationInjectResourceDetectionStrategyMultiplexer.class, new ConfigurationInjectResourceDetectionStrategyMultiplexer() {
-            @Override
-            public @Nullable Resource detectResource(@NotNull SlingHttpServletRequest request) {
-                return null;
-            }
-
-        }, Constants.SERVICE_RANKING, 100);
+        context.registerService(
+                ConfigurationInjectResourceDetectionStrategyMultiplexer.class,
+                new ConfigurationInjectResourceDetectionStrategyMultiplexer() {
+                    @Override
+                    public @Nullable Resource detectResource(@NotNull SlingHttpServletRequest request) {
+                        return null;
+                    }
+                },
+                Constants.SERVICE_RANKING,
+                100);
         assertSingleConfig(SingleConfigModel.class, context.request(), SingleConfig::stringParam);
     }
 
@@ -129,12 +139,16 @@ class ContextAwareConfigurationInjectorTest {
 
     @Test
     void testSingleConfigValueMapModel_Request() {
-        assertSingleConfig(SingleConfigValueMapModel.class, context.request(), map -> map.get("stringParam", String.class));
+        assertSingleConfig(
+                SingleConfigValueMapModel.class, context.request(), map -> map.get("stringParam", String.class));
     }
 
     @Test
     void testSingleConfigValueMapModel_Resource() {
-        assertSingleConfig(SingleConfigValueMapModel.class, context.currentResource(), map -> map.get("stringParam", String.class));
+        assertSingleConfig(
+                SingleConfigValueMapModel.class,
+                context.currentResource(),
+                map -> map.get("stringParam", String.class));
     }
 
     @Test
@@ -144,7 +158,8 @@ class ContextAwareConfigurationInjectorTest {
 
     @Test
     void testSingleConfigAdaptModel_Resource() {
-        assertSingleConfig(SingleConfigAdaptModel.class, context.currentResource(), ConfigurationValuesModel::getStringParam);
+        assertSingleConfig(
+                SingleConfigAdaptModel.class, context.currentResource(), ConfigurationValuesModel::getStringParam);
     }
 
     @Test
@@ -164,7 +179,8 @@ class ContextAwareConfigurationInjectorTest {
 
     @Test
     void testListConfigValueMapModel_Resource() {
-        assertListConfig(ListConfigValueMapModel.class, context.currentResource(), map -> map.get("stringParam", String.class));
+        assertListConfig(
+                ListConfigValueMapModel.class, context.currentResource(), map -> map.get("stringParam", String.class));
     }
 
     @Test
@@ -174,10 +190,12 @@ class ContextAwareConfigurationInjectorTest {
 
     @Test
     void testListConfigAdaptModel_Resource() {
-        assertListConfig(ListConfigAdaptModel.class, context.currentResource(), ConfigurationValuesModel::getStringParam);
+        assertListConfig(
+                ListConfigAdaptModel.class, context.currentResource(), ConfigurationValuesModel::getStringParam);
     }
 
-    private <T> void assertSingleConfig(Class<? extends SingleConfigGetter<T>> modelClass, Adaptable adaptable, Function<T,String> extractor) {
+    private <T> void assertSingleConfig(
+            Class<? extends SingleConfigGetter<T>> modelClass, Adaptable adaptable, Function<T, String> extractor) {
         context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         SingleConfigGetter<T> model = adaptable.adaptTo(modelClass);
         assertNotNull(model);
@@ -185,7 +203,8 @@ class ContextAwareConfigurationInjectorTest {
         assertEquals("value1", extractor.apply(config));
     }
 
-    private <T> void assertListConfig(Class<? extends ListConfigGetter<T>> modelClass, Adaptable adaptable, Function<T,String> extractor) {
+    private <T> void assertListConfig(
+            Class<? extends ListConfigGetter<T>> modelClass, Adaptable adaptable, Function<T, String> extractor) {
         context.registerInjectActivateService(ContextAwareConfigurationInjector.class);
         ListConfigGetter<T> model = adaptable.adaptTo(modelClass);
         assertNotNull(model);
@@ -194,7 +213,7 @@ class ContextAwareConfigurationInjectorTest {
         assertListValues(ImmutableList.copyOf(model.getConfigArray()), extractor);
     }
 
-    private <T> void assertListValues(List<T> configList, Function<T,String> extractor) {
+    private <T> void assertListValues(List<T> configList, Function<T, String> extractor) {
         assertNotNull(configList);
         assertEquals(2, configList.size());
         assertEquals("item1", extractor.apply(configList.get(0)));
@@ -239,5 +258,4 @@ class ContextAwareConfigurationInjectorTest {
         InvalidSetModel model = context.request().adaptTo(InvalidSetModel.class);
         assertNull(model);
     }
-
 }

@@ -34,5 +34,4 @@ class ContextAwareConfigurationProcessor extends AbstractInjectAnnotationProcess
     public InjectionStrategy getInjectionStrategy() {
         return annotation.injectionStrategy();
     }
-
 }

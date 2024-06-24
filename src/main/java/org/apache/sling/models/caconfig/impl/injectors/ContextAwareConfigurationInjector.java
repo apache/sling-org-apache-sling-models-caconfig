@@ -1,18 +1,20 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.sling.models.caconfig.impl.injectors;
 
@@ -48,16 +50,19 @@ import org.osgi.service.component.propertytypes.ServiceRanking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(service = { Injector.class, StaticInjectAnnotationProcessorFactory.class, AcceptsNullName.class })
+@Component(service = {Injector.class, StaticInjectAnnotationProcessorFactory.class, AcceptsNullName.class})
 @ServiceRanking(6000)
-public class ContextAwareConfigurationInjector implements Injector, StaticInjectAnnotationProcessorFactory, AcceptsNullName {
+public class ContextAwareConfigurationInjector
+        implements Injector, StaticInjectAnnotationProcessorFactory, AcceptsNullName {
 
     private static final Logger log = LoggerFactory.getLogger(ContextAwareConfigurationInjector.class);
 
     @Reference
     private ConfigurationResolver configurationResolver;
+
     @Reference
-    private ConfigurationInjectResourceDetectionStrategyMultiplexer configurationInjectResourceDetectionStrategyMultiplexer;
+    private ConfigurationInjectResourceDetectionStrategyMultiplexer
+            configurationInjectResourceDetectionStrategyMultiplexer;
 
     @Override
     public @NotNull String getName() {
@@ -75,8 +80,11 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
     }
 
     @Override
-    public Object getValue(@NotNull Object adaptable, String name,
-            @NotNull Type declaredType, @NotNull AnnotatedElement element,
+    public Object getValue(
+            @NotNull Object adaptable,
+            String name,
+            @NotNull Type declaredType,
+            @NotNull AnnotatedElement element,
             @NotNull DisposalCallbackRegistry callbackRegistry) {
 
         ContextAwareConfiguration annotation = getAnnotation(element);
@@ -99,9 +107,10 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
             configurationBuilder = configurationBuilder.name(annotation.name());
         }
 
-        // detect from declared type if a single configuration or configuration collection is requested and return the configuration
+        // detect from declared type if a single configuration or configuration collection is requested and return the
+        // configuration
         if (declaredType instanceof Class) {
-            Class<?> clazz = (Class<?>)declaredType;
+            Class<?> clazz = (Class<?>) declaredType;
             if (clazz.isArray()) {
                 Collection<?> result = getConfigurationCollection(configurationBuilder, clazz.getComponentType());
                 Object array = Array.newInstance(clazz.getComponentType(), result.size());
@@ -111,13 +120,11 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
                     Array.set(array, i++, resultIterator.next());
                 }
                 return array;
-            }
-            else {
+            } else {
                 return getConfiguration(configurationBuilder, clazz);
             }
-        }
-        else if (declaredType instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType)declaredType;
+        } else if (declaredType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) declaredType;
             if (parameterizedType.getActualTypeArguments().length != 1) {
                 return null;
             }
@@ -129,12 +136,10 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
             Collection<?> result = getConfigurationCollection(configurationBuilder, clazz);
             if (collectionType.equals(List.class)) {
                 return new ArrayList<>(result);
-            }
-            else {
+            } else {
                 return result;
             }
-        }
-        else {
+        } else {
             log.warn("Cannot handle type {}", declaredType);
             return null;
         }
@@ -146,10 +151,10 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
 
     private @Nullable Resource getResource(@NotNull Object adaptable) {
         if (adaptable instanceof Resource) {
-            return (Resource)adaptable;
+            return (Resource) adaptable;
         }
         if (adaptable instanceof SlingHttpServletRequest) {
-            SlingHttpServletRequest request = (SlingHttpServletRequest)adaptable;
+            SlingHttpServletRequest request = (SlingHttpServletRequest) adaptable;
             Resource resource = configurationInjectResourceDetectionStrategyMultiplexer.detectResource(request);
             if (resource == null) {
                 resource = request.getResource();
@@ -159,7 +164,8 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
         return null;
     }
 
-    private @Nullable Object getConfiguration(@NotNull ConfigurationBuilder configurationBuilder, @NotNull Class<?> clazz) {
+    private @Nullable Object getConfiguration(
+            @NotNull ConfigurationBuilder configurationBuilder, @NotNull Class<?> clazz) {
         try {
             if (clazz.equals(ValueMap.class)) {
                 return configurationBuilder.asValueMap();
@@ -168,13 +174,13 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
                 return configurationBuilder.as(clazz);
             }
             return configurationBuilder.asAdaptable(clazz);
-        }
-        catch (ConfigurationResolveException ex) {
+        } catch (ConfigurationResolveException ex) {
             throw new ConfigurationResolveException("Class " + clazz.getName() + ": " + ex.getMessage(), ex);
         }
     }
 
-    private @NotNull Collection<?> getConfigurationCollection(@NotNull ConfigurationBuilder configurationBuilder, @NotNull Class<?> clazz) {
+    private @NotNull Collection<?> getConfigurationCollection(
+            @NotNull ConfigurationBuilder configurationBuilder, @NotNull Class<?> clazz) {
         try {
             if (clazz.equals(ValueMap.class)) {
                 return configurationBuilder.asValueMapCollection();
@@ -183,8 +189,7 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
                 return configurationBuilder.asCollection(clazz);
             }
             return configurationBuilder.asAdaptableCollection(clazz);
-        }
-        catch (ConfigurationResolveException ex) {
+        } catch (ConfigurationResolveException ex) {
             throw new ConfigurationResolveException("Class " + clazz.getName() + ": " + ex.getMessage(), ex);
         }
     }
@@ -192,5 +197,4 @@ public class ContextAwareConfigurationInjector implements Injector, StaticInject
     private boolean isContextAwareConfigAnnotationClass(Class<?> clazz) {
         return clazz.isAnnotation() && clazz.isAnnotationPresent(Configuration.class);
     }
-
 }

@@ -28,5 +28,4 @@ public interface ListConfigGetter<T> {
     Collection<T> getConfigCollection();
 
     T[] getConfigArray();
-
 }
