@@ -18,12 +18,12 @@
  */
 package org.apache.sling.models.caconfig.impl.injectors;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.adapter.Adaptable;
 import org.apache.sling.api.resource.Resource;
@@ -82,9 +82,7 @@ class ContextAwareConfigurationInjectorTest {
                 context,
                 "/content/region/site",
                 ListConfig.class,
-                ImmutableList.of(
-                        ImmutableMap.<String, Object>of("stringParam", "item1"),
-                        ImmutableMap.<String, Object>of("stringParam", "item2")));
+                List.of(Map.of("stringParam", "item1"), Map.of("stringParam", "item2")));
     }
 
     @Test
@@ -105,7 +103,7 @@ class ContextAwareConfigurationInjectorTest {
                     @Override
                     @SuppressWarnings("null")
                     public @Nullable Resource detectResource(@NotNull SlingHttpServletRequest request) {
-                        if (StringUtils.equals(request.getResource().getPath(), otherCurrentResource.getPath())) {
+                        if (Strings.CS.equals(request.getResource().getPath(), otherCurrentResource.getPath())) {
                             return context.resourceResolver().getResource("/content/region/site/en");
                         }
                         return null;
@@ -209,8 +207,8 @@ class ContextAwareConfigurationInjectorTest {
         ListConfigGetter<T> model = adaptable.adaptTo(modelClass);
         assertNotNull(model);
         assertListValues(model.getConfigList(), extractor);
-        assertListValues(ImmutableList.copyOf(model.getConfigCollection()), extractor);
-        assertListValues(ImmutableList.copyOf(model.getConfigArray()), extractor);
+        assertListValues(List.copyOf(model.getConfigCollection()), extractor);
+        assertListValues(Arrays.asList(model.getConfigArray()), extractor);
     }
 
     private <T> void assertListValues(List<T> configList, Function<T, String> extractor) {
